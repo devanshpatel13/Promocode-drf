@@ -18,7 +18,7 @@ urlpatterns = [
     # path("mixinget/<id>/", StudentmixinView.as_view(),name = "mixin"),
     path('product/', ProductView.as_view(),name ="stud"),
     path('coupon/',CouponView.as_view(),name = "coupon"),
-
+    path("couponedit/<int:pk>/", CouponupdateView.as_view(), name = "couponedit"),
     path('auth', include('rest_framework.urls', namespace='rest_framework'))
 
 ]
