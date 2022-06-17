@@ -2,7 +2,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser, User
-
+from django.core.exceptions import ValidationError
 # Create your models here.
 from rest_framework.validators import UniqueValidator
 
@@ -34,17 +34,19 @@ class User(AbstractUser):
 class Coupon(models.Model):
     Coupon_REGEX = RegexValidator("[A-Z]+", 'USE CAPITAL LETTER')
     coupon = models.CharField(max_length=6, validators=[Coupon_REGEX])
-    create_date = models.DateField()
-    expiry_date = models.DateField()
+    create_date = models.DateTimeField()
+    expiry_date = models.DateTimeField()
     user = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE)
     gender = models.CharField(max_length=20, choices=CHOICES)
     discount = models.IntegerField()
     discount_type = models.CharField(max_length=20, choices=Discount)
-    active = models.BooleanField(default=True)
+    # active = models.BooleanField(default=True)
     user_limit = models.IntegerField()
     max_user = models.IntegerField(default=1)
-
-
+    is_active = models.BooleanField(default=True)
+    def validate(self):
+        if self.create_date < self.expiry_date:
+            raise ValidationError("please change date, b'cos your expiry date is less then create date ")
     def __str__(self):
         return self.coupon
 

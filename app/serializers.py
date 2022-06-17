@@ -21,7 +21,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             'last_name': {'required': True}
         }
 
-
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"password": "Password fields didn't match."})
@@ -63,11 +62,18 @@ class Productserializers(serializers.ModelSerializer):
         user = self.context.get('request').user
         birthdate = User.objects.filter(birthdate=user.birthdate).first()
 
+        expiry_date = coupon.expiry_date
+        print(expiry_date,"fffffffffffffffffff")
+        validdate = datetime.datetime.now().strftime("%m-%d")
+
+        # import pdb;
+        # pdb.set_trace()
         if coupon.discount_type == "flat":
             total = price - coupon.discount
         else:
             birthdate = birthdate.birthdate
             validdate = datetime.datetime.now().strftime("%m-%d")
+
 
             if birthdate and birthdate.strftime("%m-%d") == validdate:
                 discount = price * (coupon.discount / 100)
@@ -79,30 +85,31 @@ class Productserializers(serializers.ModelSerializer):
         coupon_use_limit = coupon.max_user
         coupon_usee_limit = coupon.user_limit
 
-        if user.is_authenticated:
-
-            user_count = len(Product.objects.filter(user=user, coupon=coupon))
-            coupon_count = len(Product.objects.filter(coupon=coupon))
-
-            if coupon_count > coupon_usee_limit:
-                raise serializers.ValidationError("Coupon limit is over")
-
-            if user_count > coupon_use_limit:
-                raise serializers.ValidationError("Per user limit is over")
-
-            coupon.max_limit = coupon.max_user - 1
-            coupon.save()
-        else:
+        if not user.is_authenticated:
             raise serializers.ValidationError("choose different coupon or coupon limit is over")
 
+        user_count = len(Product.objects.filter(user=user, coupon=coupon))
+        coupon_count = len(Product.objects.filter(coupon=coupon))
+
+        if coupon_count > coupon_usee_limit:
+            raise serializers.ValidationError("Coupon limit is over")
+
+        if user_count > coupon_use_limit:
+            raise serializers.ValidationError("Per user limit is over")
+
+        coupon.max_limit = coupon.max_user - 1
+        coupon.save()
         attrs['coupon'] = coupon
         attrs['user_id'] = user.id
         attrs['total'] = total
+        if expiry_date.strftime("%m-%d") < validdate:
+            raise serializers.ValidationError("Coupon has been expired")
         return attrs
 
 
 class Couponserializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
-        fields = ['coupon','create_date','expiry_date','user','gender','discount','discount_type','user_limit','max_user']
+        fields = ['coupon', 'create_date', 'expiry_date', 'user', 'gender', 'discount', 'discount_type', 'user_limit',
+                  'max_user']
         raed_only_field = ['is_active']

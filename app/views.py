@@ -60,3 +60,25 @@ class ProductView(generics.ListCreateAPIView):
 class CouponView(generics.ListCreateAPIView):
     queryset = Coupon.objects.all()
     serializer_class = Couponserializer
+
+
+
+class CouponupdateView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Coupon.objects.all()
+    serializer_class = Couponserializer
+    # lookup_field = 'id'
+
+    def update(self, request, *args, **kwargs):
+        id = kwargs["pk"]
+        coupon = Coupon.objects.get(id = id)
+        user_count = len(Product.objects.filter(coupon=coupon))
+        if user_count == 0:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return JsonResponse(serializer.data)
+        else:
+            print("sssssssssssssssss")
+            return JsonResponse({'msg':'sssssssssssssss'})

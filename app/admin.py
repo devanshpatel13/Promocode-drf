@@ -22,5 +22,5 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
-    list_display = ['coupon','create_date','expiry_date','user','gender','discount','discount_type','active']
+    list_display = ['id','coupon','create_date','expiry_date','user','gender','discount','discount_type','is_active']
 
