@@ -64,10 +64,7 @@ class Productserializers(serializers.ModelSerializer):
 
         expiry_date = coupon.expiry_date
         print(expiry_date,"fffffffffffffffffff")
-        validdate = datetime.datetime.now().strftime("%m-%d")
-
-        # import pdb;
-        # pdb.set_trace()
+        validdate = datetime.datetime.now().strftime("%m-%d-%y")
         if coupon.discount_type == "flat":
             total = price - coupon.discount
         else:
@@ -102,9 +99,11 @@ class Productserializers(serializers.ModelSerializer):
         attrs['coupon'] = coupon
         attrs['user_id'] = user.id
         attrs['total'] = total
-        if expiry_date.strftime("%m-%d") < validdate:
+        if expiry_date.strftime("%m-%d-%y") < validdate:
             raise serializers.ValidationError("Coupon has been expired")
         return attrs
+
+
 
 
 class Couponserializer(serializers.ModelSerializer):

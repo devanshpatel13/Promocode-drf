@@ -81,4 +81,18 @@ class CouponupdateView(generics.RetrieveUpdateDestroyAPIView):
             return JsonResponse(serializer.data)
         else:
             print("sssssssssssssssss")
-            return JsonResponse({'msg':'sssssssssssssss'})
+            return JsonResponse({'msg':'you can not update this coupon , B;cos it ss used'})
+
+
+    def destroy(self, request, *args, **kwargs):
+        id = kwargs['pk']
+        coupon  = Coupon.objects.get(id = id )
+        user_count = len(Product.objects.filter(coupon= coupon))
+        if user_count == 0:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return JsonResponse({'msg':"Deleted successfully"})
+
+        else :
+            print("ddddddddddddddddddddddddd")
+            return JsonResponse({"mag":"coupon has been used"})
