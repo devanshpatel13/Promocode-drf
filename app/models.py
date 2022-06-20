@@ -42,7 +42,7 @@ class Coupon(models.Model):
     discount_type = models.CharField(max_length=20, choices=Discount)
     # active = models.BooleanField(default=True)
     user_limit = models.IntegerField()
-    max_user = models.IntegerField(default=1)
+    coupon_limit = models.IntegerField(default=1)
     is_active = models.BooleanField(default=True)
     def validate(self):
         if self.create_date < self.expiry_date:

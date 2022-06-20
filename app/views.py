@@ -80,7 +80,7 @@ class CouponupdateView(generics.RetrieveUpdateDestroyAPIView):
             self.perform_update(serializer)
             return JsonResponse(serializer.data)
         else:
-            print("sssssssssssssssss")
+            # print("sssssssssssssssss")
             return JsonResponse({'msg':'you can not update this coupon , B;cos it ss used'})
 
 
